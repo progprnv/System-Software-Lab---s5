@@ -1,4 +1,9 @@
+
+
+## AUG 7 viva qn
+
 You're learning 8086 Assembly Language! Great step for low-level understanding of computers. I'll **explain each of your 3 programs line by line** as a beginner-friendly guide.
+
 
 ---
 
