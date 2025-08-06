@@ -1,142 +1,185 @@
-# aug2 viva
-
-Great! You’ve shared two Assembly language programs. I’ll explain both line by line in a simple, beginner-friendly way (as if you're 17 years old and just starting with Assembly).
+You're learning 8086 Assembly Language! Great step for low-level understanding of computers. I'll **explain each of your 3 programs line by line** as a beginner-friendly guide.
 
 ---
 
-## 🧠 **Program 1: Add Two Numbers and Store Result + Carry**
+## ✅ **PROGRAM 1 — PRINT "HELLO WORLD!"**
 
-📜 **Filename: IMG-20250801-WA0010.jpg**
+### 🔷 CODE:
 
 ```asm
-DATA SEGMENT
-  N1 DW 0050H      ; N1 is a 16-bit variable with value 50h (hex) = 80 (decimal)
-  N2 DW 00F0H      ; N2 = F0h = 240 decimal
-  N3 DW ?          ; N3 is uninitialized, will store the result
-  N4 DW ?          ; N4 is uninitialized, will store carry if any
-DATA ENDS
+PROGRAM 
+D SEGMENT 
+STRING DB 'HELLO WORLD!$' 
+D ENDS 
+C SEGMENT 
+ASSUME CS:C, DS:D 
+START: 
+MOV AX,D 
+MOV DS,AX 
+LEA DX,STRING 
+MOV AH,09H 
+INT 21H 
+MOV AH,4CH 
+INT 21H 
+C ENDS 
+END START 
 ```
 
-* **DW** = Define Word (16-bit)
-* `?` means uninitialized
-* We're reserving space for storing data.
+### 🔷 OUTPUT:
 
-```asm
-CODE SEGMENT
-ASSUME CS:CODE, DS:DATA
 ```
-
-* We're telling the assembler to treat `CS` (Code Segment) and `DS` (Data Segment) accordingly.
-
----
-
-### 🚀 Start of Program
-
-```asm
-START:
-MOV AX, DATA     ; Move address of DATA segment into AX
-MOV DS, AX       ; Load that address into DS register (needed to access variables)
-```
-
-> You **must load the segment address into DS** before accessing variables like `N1`.
-
-```asm
-XOR AX, AX       ; AX = 0 (clears AX register)
-MOV BX, AX       ; BX = 0 (clears BX register, used for carry)
-MOV AX, N1       ; AX = N1 (load first number)
-ADD AX, N2       ; AX = AX + N2 (adds second number)
-JNC STOP         ; Jump to STOP if there is NO Carry
-INC BX           ; If Carry happened, increase BX (BX = 1)
-MOV N4, BX       ; Store BX (carry info) into N4
-```
-
-* **JNC** = Jump if No Carry. If there's a carry (e.g., sum > 0xFFFF), it skips `INC BX`.
-
-```asm
-STOP:
-MOV N3, AX       ; Store the result of addition in N3
-MOV AH, 4CH      ; Exit function for DOS interrupt
-INT 21H          ; Call DOS to exit program
-```
-
-> ✅ This program adds two numbers, stores result in `N3`, and carry (if any) in `N4`.
-
----
-
-## ✅ Output for Program 1:
-
-* N1 = 80
-* N2 = 240
-* N1 + N2 = 320 → 0x0140 → No carry, so:
-
-  * N3 = 0140h
-  * N4 = 0000h
-
----
-
-## 📜 **Program 2: Display "Hello World!"**
-
-📜 **Filename: IMG-20250801-WA0007.jpg**
-
-```asm
-D SEGMENT
-STRING DB 'Hello World!$'
-D ENDS
-```
-
-* A string is defined with **\$** at the end (for DOS to know where to stop printing).
-* `DB` = Define Byte
-
----
-
-```asm
-C SEGMENT
-ASSUME CS:C, DS:D
-START:
-MOV AX,D      ; Load address of data segment (D) into AX
-MOV DS,AX     ; Move it to DS so we can access STRING
-LEA DX,STRING ; Load address of STRING into DX register
-```
-
-> `LEA` = Load Effective Address (used for strings/pointers)
-
-```asm
-MOV AH,9      ; DOS function 9 (to display a string)
-INT 21H       ; Call DOS interrupt to print string
-```
-
-> This will print: **Hello World!**
-
-```asm
-MOV AH,4CH    ; DOS function to exit
-INT 21H       ; Exit program
+HELLO WORLD!
 ```
 
 ---
 
-## ✅ Output for Program 2:
+### 🧠 **Explanation:**
 
-```
-Hello World!
-```
-
-💡 The `$` at the end of the string tells DOS where to stop printing. It won't print `$` itself.
-
----
-
-## Let me simplify the **concepts** for you:
-
-| Term         | What it does                              |
-| ------------ | ----------------------------------------- |
-| `MOV`        | Copy value from one place to another      |
-| `XOR AX, AX` | A trick to set AX = 0                     |
-| `JNC`        | Jump if there’s No Carry (from addition)  |
-| `INT 21H`    | A DOS interrupt (used to print/exit/etc.) |
-| `DW`         | Define a 16-bit number                    |
-| `DB`         | Define a Byte (for characters or strings) |
-| `LEA`        | Used to get the address of a variable     |
+* `PROGRAM` — Label for the program (optional).
+* `D SEGMENT` — Define **Data Segment** (`D`), where we store variables/data.
+* `STRING DB 'HELLO WORLD!$'` — Create a string constant that ends with `$` (DOS needs `$` to know where the string ends).
+* `D ENDS` — End of Data Segment.
 
 ---
 
-Would you like a flowchart or memory snapshot diagram to go along with these?
+### ▶ CODE Segment (Executable Instructions):
 
+* `C SEGMENT` — Define Code Segment.
+* `ASSUME CS:C, DS:D` — Tell assembler that:
+
+  * `CS` (Code Segment) = `C`
+  * `DS` (Data Segment) = `D`
+
+---
+
+### ▶ Execution begins at `START:` label:
+
+* `MOV AX,D` — Move address of Data Segment `D` to AX register.
+* `MOV DS,AX` — Set DS register to point to data segment.
+* `LEA DX,STRING` — Load the address of the string into DX.
+* `MOV AH,09H` — Tell DOS that you want to print a string (`09H` is print service).
+* `INT 21H` — Call DOS interrupt to do the print.
+* `MOV AH,4CH` — Tell DOS you want to exit the program.
+* `INT 21H` — Exit the program.
+* `C ENDS` / `END START` — Marks end of code and where execution begins.
+
+---
+
+## ✅ **PROGRAM 2 — ADDITION with CARRY DETECTION**
+
+```asm
+DATA SEGMENT 
+N1 DW 0050H 
+N2 DW 00F0H 
+N3 DW ? 
+N4 DW ? 
+DATA ENDS 
+```
+
+### ➕ Two numbers to add:
+
+* `N1 = 0050H (80)`
+* `N2 = 00F0H (240)`
+* `N3` will hold **sum**
+* `N4` will hold **carry (BX)**
+
+---
+
+### 🧠 **Code Explanation:**
+
+```asm
+CODE SEGMENT 
+ASSUME CS:CODE,DS:DATA 
+START: 
+MOV AX,DATA      ; Load address of data segment
+MOV DS,AX        ; Set data segment
+XOR AX,AX        ; Clear AX = 0
+MOV BX,AX        ; Clear BX = 0
+MOV AX,N1        ; AX = N1 = 0050H
+ADD AX,N2        ; AX = AX + N2 = 0050 + 00F0 = 0140H
+JNC STOP         ; If NO carry, jump to STOP
+INC BX           ; If carry occurred, increment BX
+MOV N4,BX        ; Store carry (0 or 1) to N4
+STOP: 
+MOV N3,AX        ; Store result (sum) to N3
+MOV AH,4CH       ; Exit program
+INT 21H 
+CODE ENDS 
+END START 
+```
+
+### 📤 **OUTPUT:**
+
+* `N1 = 0050H = 80`
+* `N2 = 00F0H = 240`
+* `N3 = 0140H = 320`
+* `N4 = 0` (no carry occurred since sum < 0xFFFF)
+
+---
+
+## ✅ **PROGRAM 3 — SUBTRACTION with BORROW DETECTION**
+
+```asm
+DATA SEGMENT 
+N1 DW 00F0H 
+N2 DW 0050H 
+N3 DW ? 
+N4 DW ? 
+DATA ENDS 
+```
+
+### ➖ Two numbers to subtract:
+
+* `N1 = 00F0H (240)`
+* `N2 = 0050H (80)`
+* `N3` will hold result
+* `N4` will hold borrow flag (BX)
+
+---
+
+### 🧠 **Code Explanation:**
+
+```asm
+CODE SEGMENT 
+ASSUME CS:CODE, DS:DATA 
+START: 
+MOV AX, DATA     ; Load address of data segment
+MOV DS, AX       ; Set DS
+XOR AX, AX       ; Clear AX
+XOR BX, BX       ; Clear BX
+MOV AX, N1       ; AX = N1 = 00F0
+SUB AX, N2       ; AX = AX - N2 = 00F0 - 0050 = 00A0
+JNC NO_BORROW    ; Jump if no borrow
+INC BX           ; If borrow occurred, BX++
+NO_BORROW: 
+MOV N4, BX       ; Store borrow status in N4
+MOV N3, AX       ; Store result in N3
+MOV AH, 4CH      ; Exit
+INT 21H 
+CODE ENDS 
+END START 
+```
+
+### 📤 **OUTPUT:**
+
+* `N3 = 00A0H (160)`
+* `N4 = 0` (no borrow occurred)
+
+---
+
+## ✅ SUMMARY FOR BEGINNERS:
+
+| Concept        | Meaning                                           |
+| -------------- | ------------------------------------------------- |
+| `SEGMENT/ENDS` | Group data or code together                       |
+| `ASSUME`       | Tell assembler what `CS` and `DS` point to        |
+| `MOV`          | Move data between registers/memory                |
+| `XOR AX, AX`   | Clear register AX (make it 0)                     |
+| `INT 21H`      | Call DOS services (like print or exit)            |
+| `ADD`, `SUB`   | Add or Subtract numbers                           |
+| `JNC`          | Jump if no carry (for add) or no borrow (for sub) |
+| `LEA`          | Load memory address                               |
+
+---
+
+If you'd like me to **draw memory layout or animation of what happens step by step**, just ask!
