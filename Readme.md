@@ -1,4 +1,4 @@
-## aug 13 LAb 
+## aug 13 LAb - 32 bit
 
 Alright, let’s go step-by-step and break down these **three programs** like I’m explaining to a 7-year-old.
 
