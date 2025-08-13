@@ -1,4 +1,231 @@
+## aug 13 LAb 
 
+Alright, let’s go step-by-step and break down these **three programs** like I’m explaining to a 7-year-old.
+
+---
+
+## **Program 1 – Adding Two Large Numbers**
+
+(First image)
+
+### Purpose:
+
+This program adds two big numbers (each number is stored in two parts because registers can only hold small pieces at a time).
+
+### Step-by-step:
+
+```
+DATA SEGMENT
+NUM1 DW 1234H,5678H
+NUM2 DW 0AB12H,0CDEFH
+RESULT DW 3 DUP(?)
+```
+
+* **DATA SEGMENT** → We are telling the computer, “Here is the storage box for our numbers.”
+* **NUM1** → First big number: first half = `1234H`, second half = `5678H`.
+* **NUM2** → Second big number: first half = `AB12H`, second half = `CDEFH`.
+* **RESULT** → A box to store the answer. `3 DUP(?)` means make 3 empty spots.
+
+---
+
+```
+CODE SEGMENT
+ASSUME CS:CODE, DS:DATA
+```
+
+* We say: **CS** (Code Segment) will use `CODE` and **DS** (Data Segment) will use `DATA`.
+
+---
+
+```
+MOV AX,DATA
+MOV DS,AX
+```
+
+* Put the **address of DATA** into DS (so DS can find our numbers).
+
+```
+MOV DX,00H
+```
+
+* DX will store carry from addition. Start with `0`.
+
+---
+
+```
+MOV AX,NUM1
+MOV BX,NUM2
+CLC
+ADD AX,BX
+MOV RESULT,AX
+```
+
+* Load **first halves** of numbers into AX and BX.
+* **CLC** means "clear carry".
+* Add them → store in RESULT.
+
+---
+
+```
+MOV AX,NUM1+2
+MOV BX,NUM2+2
+ADC AX,BX
+MOV RESULT+2,AX
+```
+
+* Load **second halves** of numbers.
+* **ADC** = Add with Carry (if the first addition had overflow).
+* Store result in RESULT+2 (next part of memory).
+
+---
+
+```
+ADDC DX,00H
+MOV RESULT+4,DX
+```
+
+* Save final carry into RESULT+4.
+
+---
+
+```
+MOV AH,4CH
+INT 21H
+```
+
+* End program and return to DOS.
+
+📌 **Summary**: It adds two big numbers (4 bytes each) and stores result in 6 bytes.
+
+---
+
+## **Program 2 – Subtracting Two Large Numbers**
+
+(Second image)
+
+This one is just like Program 1 but instead of **ADD** it uses **SUB**.
+
+---
+
+```
+DATA SEGMENT
+NUM2 DW 1234H,5678H
+NUM1 DW 0AB12H,0CDEFH
+RESULT DW 3 DUP(?)
+```
+
+* NUM2 is the first number, NUM1 is the second.
+* We will do NUM2 - NUM1.
+
+---
+
+```
+MOV AX,NUM1
+MOV BX,NUM2
+CLC
+SUB AX,BX
+MOV RESULT,AX
+```
+
+* First halves → Subtract BX from AX → store.
+
+---
+
+```
+MOV AX,NUM1+2
+MOV BX,NUM2+2
+SBB AX,BX
+MOV RESULT+2,AX
+```
+
+* Second halves → Subtract with borrow (SBB).
+
+---
+
+```
+SBB DX,00H
+MOV RESULT+4,DX
+```
+
+* Store final borrow into last part.
+
+📌 **Summary**: It subtracts two large numbers using SUB and SBB.
+
+---
+
+## **Program 3 – Printing Two Messages**
+
+(Third image)
+
+This one is simpler — it just prints two words.
+
+---
+
+```
+DATA SEGMENT
+MSG1 DB "HELLO$"
+MSG2 DB "WORLD$"
+DATA ENDS
+```
+
+* MSG1 = "HELLO\$"
+* MSG2 = "WORLD\$"
+* `$` means “end of text” for DOS.
+
+---
+
+```
+MOV AX,DATA
+MOV DS,AX
+```
+
+* Load the address of DATA into DS.
+
+---
+
+```
+LEA DX,MSG1
+MOV AH,09H
+INT 21H
+```
+
+* **LEA DX,MSG1** → Put the starting address of MSG1 into DX.
+* AH = 09H means “print string”.
+* INT 21H calls DOS to print "HELLO".
+
+---
+
+```
+LEA DX,MSG2
+MOV AH,09H
+INT 21H
+```
+
+* Same thing for "WORLD".
+
+---
+
+```
+MOV AH,4CH
+INT 21H
+```
+
+* End the program.
+
+📌 **Summary**: Prints “HELLO” and “WORLD” one after another.
+
+---
+
+If you want, I can **draw diagrams** showing memory layout for these programs so you can visualize how numbers and strings are stored. That will make them super easy to understand.
+
+
+
+
+
+
+
+
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 
 ## AUG 7 viva qn
 
