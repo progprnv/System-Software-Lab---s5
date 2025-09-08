@@ -229,6 +229,122 @@ If you want, I can **draw diagrams** showing memory layout for these programs so
 
 
 
+## for 16 bit
+
+Perfect 👍
+I’ll explain both programs step by step in **very simple beginner-friendly language**, as if you are just starting out in engineering and learning Assembly Language.
+
+---
+
+## 📌 First Program (Addition with Carry Check)
+
+### Code Summary
+
+This program:
+
+1. Takes two numbers (N1 = 0050H and N2 = 00F0H).
+2. Adds them together.
+3. Stores the result in **N3**.
+4. If there’s a carry (when the sum is bigger than what one register can hold), it increases **N4** to record that carry.
+
+---
+
+### Explanation
+
+* `DATA SEGMENT ... DATA ENDS` → This is where we keep our numbers.
+
+  * N1 = 50H (80 in decimal)
+  * N2 = F0H (240 in decimal)
+  * N3, N4 = Empty (for storing answers).
+
+* `CODE SEGMENT ... CODE ENDS` → This is where the instructions are written.
+
+* `MOV AX, DATA` and `MOV DS, AX` → Setup step: Tells the CPU where our data (N1, N2) is stored.
+
+* `XOR AX, AX` → Clears AX (makes AX = 0).
+
+* `MOV BX, AX` → Clears BX too (BX = 0).
+
+* `MOV AX, N1` → Loads N1 (50H) into AX.
+
+* `ADD AX, N2` → Adds N2 (F0H) to AX.
+  👉 So, AX = 50H + F0H = 140H (320 in decimal).
+  But since AX is only 16-bit, it checks for carry.
+
+* `JNC STOP` → "Jump if No Carry".
+  If there is **no carry**, go to STOP.
+  If there **is a carry**, continue.
+
+* `INC BX` → If carry happens, increase BX (like a flag counter).
+
+* `MOV N4, BX` → Store carry info in N4.
+
+* `STOP: MOV N3, AX` → Store final result in N3.
+
+* `MOV AH, 4CH / INT 21H` → End program.
+
+✅ So, N3 = Result of addition, N4 = Carry info.
+
+---
+
+## 📌 Second Program (Subtraction with Borrow Check)
+
+### Code Summary
+
+This program:
+
+1. Takes two numbers (N1 = 0080H, N2 = 0060H).
+2. Subtracts them (N1 - N2).
+3. Stores the result in **N3**.
+4. If there’s a borrow (when we subtract a bigger number from a smaller one), it records it in **N4**.
+
+---
+
+### Explanation
+
+* Same setup with `DATA SEGMENT`, `CODE SEGMENT`.
+
+* `MOV AX, DATA` and `MOV DS, AX` → Setup step again.
+
+* `XOR AX, AX` and `XOR BX, BX` → Clear AX and BX.
+
+* `MOV AX, N1` → Put N1 (0080H = 128) in AX.
+
+* `SUB AX, N2` → Subtract N2 (0060H = 96).
+  👉 AX = 80H - 60H = 20H (32 in decimal).
+
+* `JNC NO_BORROW` → If **no borrow**, jump to NO\_BORROW.
+  If there **is a borrow**, then continue.
+
+* `INC BX` → Increase BX if borrow happened.
+
+* `MOV N4, BX` → Save borrow info in N4.
+
+* `NO_BORROW: MOV N3, AX` → Save the result in N3.
+
+* `MOV AH, 4CH / INT 21H` → End program.
+
+✅ So, N3 = Result of subtraction, N4 = Borrow info.
+
+---
+
+## 🎯 Super Simple Analogy
+
+Think of **AX** as your notebook where you do calculations.
+
+* In the first program, you **add two numbers**. If the sum is too big to fit, you raise your hand (that’s the **carry** stored in N4).
+* In the second program, you **subtract two numbers**. If you don’t have enough to subtract, you borrow from your friend (that’s the **borrow**, also stored in N4).
+
+So:
+
+* **Program 1 = Adding with carry check.**
+* **Program 2 = Subtracting with borrow check.**
+
+---
+
+👉 Do you want me to also **show the actual final values of N3 and N4** after running both programs (with the given N1 and N2)?
+
+
 
 
 
