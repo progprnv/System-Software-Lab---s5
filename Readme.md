@@ -1,212 +1,160 @@
-## progrm masm string op thru keyboard
-
+Data Definition
 DATA SEGMENT
 STRING1 DB 99H,12H,56H,45H,36H
 DATA ENDS
 
+
+Defines DATA SEGMENT where array is stored.
+
+STRING1 = array of 5 bytes: 99h, 12h, 56h, 45h, 36h.
+
+These values are placed in consecutive memory locations.
+
+🔹 Code Segment Initialization
 CODE SEGMENT
 ASSUME CS:CODE,DS:DATA
 
+
+Defines CODE SEGMENT (where instructions are kept).
+
+ASSUME tells assembler:
+
+CS register points to CODE segment.
+
+DS register points to DATA segment.
+
+🔹 Start Program
 START:
     MOV AX,DATA
     MOV DS,AX
-    MOV CH,04H        ; outer loop counter
-
-UP2: 
-    MOV CL,04H        ; inner loop counter
-    LEA SI,STRING1    ; point SI to start of STRING1
-
-L3: 
-    MOV AL,[SI]       ; load current element
-    CMP AL,[SI+1]     ; compare with next element
-    JGE L1            ; if AL >= next, skip swap
-    XCHG AL,[SI+1]    ; else swap
-    MOV [SI],AL
-
-L1: 
-    INC SI            ; move to next element
-    LOOP L3           ; repeat inner loop
-    DEC CH            ; decrement outer loop
-    JNZ UP2           ; repeat until sorted
-
-    INT 3             ; program end
-
-CODE ENDS
-END START
 
 
-Perfect 👍 let me explain this whole program **step by step in very simple language**, as if I’m teaching a 12-year beginner.
+Loads base address of DATA SEGMENT into AX.
 
----
+Copies it into DS (Data Segment Register).
 
-## 🖥️ What this program does
+Now DS points to the data segment, so [SI] means DS:SI.
 
-It takes a list of numbers:
-
-```
-99, 12, 56, 45, 36
-```
-
-and **sorts them in ascending order** (smallest to largest).
-
-So at the end it will become:
-
-```
-12, 36, 45, 56, 99
-```
-
-This is done using a method called **Bubble Sort**.
-
----
-
-## 🏗️ Breaking down the code
-
-### 1. DATA SEGMENT
-
-```asm
-DATA SEGMENT
-STRING1 DB 99H,12H,56H,45H,36H
-DATA ENDS
-```
-
-* `DATA SEGMENT` → this is the memory area where we keep our data.
-* `STRING1` → this is our list of numbers.
-* `DB` → means “Define Byte” (store one-byte numbers).
-* So here, we stored: **99, 12, 56, 45, 36**.
-
----
-
-### 2. CODE SEGMENT
-
-```asm
-CODE SEGMENT
-ASSUME CS:CODE,DS:DATA
-```
-
-* `CODE SEGMENT` → tells that now instructions (program steps) will start.
-* `ASSUME` → tells the computer that
-
-  * CS (Code Segment) will use CODE,
-  * DS (Data Segment) will use DATA.
-
----
-
-### 3. Program START
-
-```asm
-START:
-    MOV AX,DATA
-    MOV DS,AX
-```
-
-* These two lines connect the `DATA SEGMENT` to the CPU registers.
-* Think of it as telling the CPU: “Here’s where my numbers are stored, please use them.”
-
----
-
-### 4. Set outer loop
-
-```asm
+🔹 Outer Loop Setup
     MOV CH,04H
-```
 
-* CH = 4 → this is the **outer loop counter**.
-* It means we will do 4 passes (because we have 5 numbers, need 4 rounds).
 
----
+CH = 4 → Outer loop counter.
 
-### 5. Inner loop setup
+Because for N elements, Bubble Sort needs N–1 passes.
 
-```asm
+Here N = 5 → 4 passes.
+
+🔹 Inner Loop Setup
 UP2: 
     MOV CL,04H
     LEA SI,STRING1
-```
 
-* CL = 4 → inner loop counter.
-* `LEA SI,STRING1` → load the address of our list into SI.
-* SI will **point to the current number** while comparing.
 
----
+CL = 4 → inner loop counter (comparisons per pass).
 
-### 6. Compare and Swap
+LEA SI,STRING1 → SI = offset address of the first element in STRING1.
 
-```asm
+Now SI points to the beginning of the array.
+
+🔹 Comparison + Swap
 L3: 
-    MOV AL,[SI]      ; take current element
-    CMP AL,[SI+1]    ; compare with next element
-    JGE L1           ; if AL >= next, don’t swap
-    XCHG AL,[SI+1]   ; else swap numbers
-    MOV [SI],AL
-```
+    MOV AL,[SI]       ; AL ← element at [SI]
+    CMP AL,[SI+1]     ; compare AL with element at [SI+1]
+    JGE L1            ; if AL >= next element → no swap
+    XCHG AL,[SI+1]    ; else swap AL and [SI+1]
+    MOV [SI],AL       ; store AL back into [SI]
 
-* `AL` = temporary register (like your hand holding a number).
-* Compare `[SI]` (current number) with `[SI+1]` (next number).
-* If current ≥ next → do nothing.
-* If current < next → swap them.
 
-So big numbers **move towards the end**, like bubbles rising up in water.
+Load current element into AL.
 
----
+Compare AL with the next element.
 
-### 7. Move to next element
+If AL ≥ next → already sorted → skip swap (JGE L1).
 
-```asm
+If AL < next → swap values using XCHG.
+
+XCHG AL,[SI+1] exchanges AL and [SI+1].
+
+Then MOV [SI],AL writes back.
+
+This is the core Bubble Sort operation.
+
+🔹 Move to Next Element
 L1: 
-    INC SI      ; go to next element
-    LOOP L3     ; repeat inner loop
-```
+    INC SI
+    LOOP L3
 
-* After checking one pair, move SI to the next element.
-* Keep looping until all pairs are checked.
 
----
+INC SI → move SI to next element.
 
-### 8. Next outer loop
+LOOP L3 → decrement CL and repeat until CL = 0 (end of inner loop).
 
-```asm
+🔹 Outer Loop Decrement
     DEC CH
     JNZ UP2
-```
 
-* Decrease CH (outer loop counter).
-* If CH ≠ 0, repeat again.
-* This ensures multiple passes are done until the list is fully sorted.
 
----
+After one full pass (inner loop finished), decrement CH.
 
-### 9. End program
+If CH ≠ 0, repeat outer loop.
 
-```asm
+Ensures multiple passes until fully sorted.
+
+🔹 End Program
     INT 3
-```
 
-* `INT 3` → stop execution (used for debugging/end).
 
----
+Executes interrupt 3 → debugger/stop.
 
-## 🎯 Final Result
+Program ends.
 
-After running this program, your list:
+🧮 Dry Run (First Two Passes)
 
-```
+Initial Array:
+
 99, 12, 56, 45, 36
-```
 
-becomes:
 
-```
+Pass 1 (largest number moves to end):
+
+Compare 99 & 12 → swap → [12, 99, 56, 45, 36]
+
+Compare 99 & 56 → swap → [12, 56, 99, 45, 36]
+
+Compare 99 & 45 → swap → [12, 56, 45, 99, 36]
+
+Compare 99 & 36 → swap → [12, 56, 45, 36, 99]
+
+Pass 2:
+
+Compare 12 & 56 → ok
+
+Compare 56 & 45 → swap → [12, 45, 56, 36, 99]
+
+Compare 56 & 36 → swap → [12, 45, 36, 56, 99]
+
+Compare 56 & 99 → ok
+
+After all 4 passes → Final Sorted Array:
+
 12, 36, 45, 56, 99
-```
 
----
 
-✅ So in **super simple words**:
+✅ Summary:
+This program implements Bubble Sort in 8086 assembly.
 
-* The program sorts numbers from small to big.
-* It keeps comparing two neighbors and swapping them if they are out of order.
-* Repeats again and again until everything is sorted.
+DATA SEGMENT stores array.
 
+CODE SEGMENT executes sorting.
+
+Outer loop (CH) ensures N–1 passes.
+
+Inner loop (CL) compares adjacent elements.
+
+CMP + XCHG perform swap.
+
+Final result = array sorted in ascending order.
 ---
 
 👉
