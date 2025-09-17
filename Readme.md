@@ -1,3 +1,234 @@
+## progrm masm string op thru keyboard
+
+DATA SEGMENT
+STRING1 DB 99H,12H,56H,45H,36H
+DATA ENDS
+
+CODE SEGMENT
+ASSUME CS:CODE,DS:DATA
+
+START:
+    MOV AX,DATA
+    MOV DS,AX
+    MOV CH,04H        ; outer loop counter
+
+UP2: 
+    MOV CL,04H        ; inner loop counter
+    LEA SI,STRING1    ; point SI to start of STRING1
+
+L3: 
+    MOV AL,[SI]       ; load current element
+    CMP AL,[SI+1]     ; compare with next element
+    JGE L1            ; if AL >= next, skip swap
+    XCHG AL,[SI+1]    ; else swap
+    MOV [SI],AL
+
+L1: 
+    INC SI            ; move to next element
+    LOOP L3           ; repeat inner loop
+    DEC CH            ; decrement outer loop
+    JNZ UP2           ; repeat until sorted
+
+    INT 3             ; program end
+
+CODE ENDS
+END START
+
+
+Perfect 👍 let me explain this whole program **step by step in very simple language**, as if I’m teaching a 12-year beginner.
+
+---
+
+## 🖥️ What this program does
+
+It takes a list of numbers:
+
+```
+99, 12, 56, 45, 36
+```
+
+and **sorts them in ascending order** (smallest to largest).
+
+So at the end it will become:
+
+```
+12, 36, 45, 56, 99
+```
+
+This is done using a method called **Bubble Sort**.
+
+---
+
+## 🏗️ Breaking down the code
+
+### 1. DATA SEGMENT
+
+```asm
+DATA SEGMENT
+STRING1 DB 99H,12H,56H,45H,36H
+DATA ENDS
+```
+
+* `DATA SEGMENT` → this is the memory area where we keep our data.
+* `STRING1` → this is our list of numbers.
+* `DB` → means “Define Byte” (store one-byte numbers).
+* So here, we stored: **99, 12, 56, 45, 36**.
+
+---
+
+### 2. CODE SEGMENT
+
+```asm
+CODE SEGMENT
+ASSUME CS:CODE,DS:DATA
+```
+
+* `CODE SEGMENT` → tells that now instructions (program steps) will start.
+* `ASSUME` → tells the computer that
+
+  * CS (Code Segment) will use CODE,
+  * DS (Data Segment) will use DATA.
+
+---
+
+### 3. Program START
+
+```asm
+START:
+    MOV AX,DATA
+    MOV DS,AX
+```
+
+* These two lines connect the `DATA SEGMENT` to the CPU registers.
+* Think of it as telling the CPU: “Here’s where my numbers are stored, please use them.”
+
+---
+
+### 4. Set outer loop
+
+```asm
+    MOV CH,04H
+```
+
+* CH = 4 → this is the **outer loop counter**.
+* It means we will do 4 passes (because we have 5 numbers, need 4 rounds).
+
+---
+
+### 5. Inner loop setup
+
+```asm
+UP2: 
+    MOV CL,04H
+    LEA SI,STRING1
+```
+
+* CL = 4 → inner loop counter.
+* `LEA SI,STRING1` → load the address of our list into SI.
+* SI will **point to the current number** while comparing.
+
+---
+
+### 6. Compare and Swap
+
+```asm
+L3: 
+    MOV AL,[SI]      ; take current element
+    CMP AL,[SI+1]    ; compare with next element
+    JGE L1           ; if AL >= next, don’t swap
+    XCHG AL,[SI+1]   ; else swap numbers
+    MOV [SI],AL
+```
+
+* `AL` = temporary register (like your hand holding a number).
+* Compare `[SI]` (current number) with `[SI+1]` (next number).
+* If current ≥ next → do nothing.
+* If current < next → swap them.
+
+So big numbers **move towards the end**, like bubbles rising up in water.
+
+---
+
+### 7. Move to next element
+
+```asm
+L1: 
+    INC SI      ; go to next element
+    LOOP L3     ; repeat inner loop
+```
+
+* After checking one pair, move SI to the next element.
+* Keep looping until all pairs are checked.
+
+---
+
+### 8. Next outer loop
+
+```asm
+    DEC CH
+    JNZ UP2
+```
+
+* Decrease CH (outer loop counter).
+* If CH ≠ 0, repeat again.
+* This ensures multiple passes are done until the list is fully sorted.
+
+---
+
+### 9. End program
+
+```asm
+    INT 3
+```
+
+* `INT 3` → stop execution (used for debugging/end).
+
+---
+
+## 🎯 Final Result
+
+After running this program, your list:
+
+```
+99, 12, 56, 45, 36
+```
+
+becomes:
+
+```
+12, 36, 45, 56, 99
+```
+
+---
+
+✅ So in **super simple words**:
+
+* The program sorts numbers from small to big.
+* It keeps comparing two neighbors and swapping them if they are out of order.
+* Repeats again and again until everything is sorted.
+
+---
+
+👉
+
+👉
+👉
+
+👉
+
+👉
+
+
+👉
+
+👉
+
+👉
+
+
+
+
+
 ## aug 13 LAb - 32 bit
 
 Alright, let’s go step-by-step and break down these **three programs** like I’m explaining to a 7-year-old.
