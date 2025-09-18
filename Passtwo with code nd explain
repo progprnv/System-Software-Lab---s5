@@ -1,0 +1,268 @@
+Perfect 👍 Thanks for sharing all 3 images. I’ll first transcribe the **full program code in plain text** from your photos, then I’ll explain the logic step by step.
+
+---
+
+## ✅ Full Program Code (Plain Text)
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+void passTwo();
+void display();
+
+void main()
+{
+    passTwo();
+    display();
+}
+
+void passTwo()
+{
+    char label[10], opcode[10], operand[10];
+    char code[10], mnemonic[10], symLabel[10], symAddr[10];
+    char objCode[20], addr[10];
+    int start = 0, locctr, length;
+
+    FILE *fp1, *fp2, *fp3, *fp4, *fp5;
+    fp1 = fopen("intermediate.txt", "r");
+    fp2 = fopen("optab.txt", "r");
+    fp3 = fopen("symtab.txt", "r");
+    fp4 = fopen("output.txt", "w");
+    fp5 = fopen("length.txt", "r");
+
+    if (!fp1 || !fp2 || !fp3 || !fp4 || !fp5)
+    {
+        printf("Error opening files!\n");
+        exit(1);
+    }
+
+    fscanf(fp1, "%s\t%s\t%s", label, opcode, operand);
+    if (strcmp(opcode, "START") == 0)
+    {
+        start = (int)strtol(operand, NULL, 16);
+        fprintf(fp4, "H^%s^%06X^", label, start);
+
+        fscanf(fp5, "%s", addr);
+        length = (int)strtol(addr, NULL, 16);
+        fprintf(fp4, "%06X\n", length);
+
+        fscanf(fp1, "%s\t%s\t%s", addr, label, opcode, operand);
+    }
+
+    locctr = start;
+    int first_record = 1;
+
+    while (strcmp(opcode, "END") != 0)
+    {
+        int found = 0;
+        strcpy(objCode, "");
+
+        rewind(fp2);
+        fscanf(fp2, "%s\t%s", code, mnemonic);
+        while (!feof(fp2))
+        {
+            if (strcmp(opcode, code) == 0)
+            {
+                rewind(fp3);
+                fscanf(fp3, "%s\t%s", symLabel, symAddr);
+                while (!feof(fp3))
+                {
+                    if (strcmp(operand, symLabel) == 0)
+                    {
+                        sprintf(objCode, "%s%s", mnemonic, symAddr);
+                        found = 1;
+                        break;
+                    }
+                    fscanf(fp3, "%s\t%s", symLabel, symAddr);
+                }
+                break;
+            }
+            fscanf(fp2, "%s\t%s", code, mnemonic);
+        }
+
+        if (found == 0 && strcmp(opcode, "BYTE") == 0)
+        {
+            if (operand[0] == 'C')
+            {
+                int len = strlen(operand);
+                strcpy(objCode, "");
+                for (int i = 2; i < len - 1; i++)
+                {
+                    char temp[10];
+                    sprintf(temp, "%X", operand[i]);
+                    strcat(objCode, temp);
+                }
+            }
+            else if (operand[0] == 'X')
+            {
+                strcpy(objCode, operand + 2);
+                objCode[strlen(operand) - 3] = '\0';
+            }
+        }
+        else if (found == 0 && strcmp(opcode, "WORD") == 0)
+        {
+            sprintf(objCode, "%06X", atoi(operand));
+        }
+        else if (found == 0)
+        {
+            strcpy(objCode, "");
+        }
+
+        if (strcmp(objCode, "") != 0)
+        {
+            if (first_record)
+            {
+                fprintf(fp4, "T^%06X^%02X^%s\n", locctr, (int)strlen(objCode) / 2, objCode);
+                first_record = 0;
+            }
+            else
+            {
+                fprintf(fp4, "T^%06X^%02X^%s\n", locctr, (int)strlen(objCode) / 2, objCode);
+            }
+        }
+
+        locctr += (int)strlen(objCode) / 2;
+        fscanf(fp1, "%s\t%s\t%s", addr, label, opcode, operand);
+    }
+
+    fprintf(fp4, "E^%06X\n", start);
+    fclose(fp4);
+    fclose(fp3);
+    fclose(fp2);
+    fclose(fp1);
+    fclose(fp5);
+}
+
+void display()
+{
+    char str;
+    FILE *fp1, *fp2, *fp3;
+
+    printf("\nThe contents of Input Table :\n\n");
+    fp1 = fopen("input.txt", "r");
+    if (fp1)
+    {
+        str = fgetc(fp1);
+        while (str != EOF)
+        {
+            printf("%c", str);
+            str = fgetc(fp1);
+        }
+        fclose(fp1);
+    }
+    else
+    {
+        printf("Error opening input.txt!\n");
+    }
+
+    printf("\n\nThe contents of Output Table :\n\n");
+    fp2 = fopen("output.txt", "r");
+    if (fp2)
+    {
+        str = fgetc(fp2);
+        while (str != EOF)
+        {
+            printf("%c", str);
+            str = fgetc(fp2);
+        }
+        fclose(fp2);
+    }
+    else
+    {
+        printf("Error opening output.txt!\n");
+    }
+
+    printf("\n\nThe contents of Symbol Table :\n\n");
+    fp3 = fopen("symtab.txt", "r");
+    if (fp3)
+    {
+        str = fgetc(fp3);
+        while (str != EOF)
+        {
+            printf("%c", str);
+            str = fgetc(fp3);
+        }
+        fclose(fp3);
+    }
+    else
+    {
+        printf("Error opening symtab.txt!\n");
+    }
+}
+```
+
+---
+
+## 📖 Explanation (Step by Step)
+
+This is a **Pass-2 Assembler Program** in C.
+
+---
+
+### 🔹 Functions:
+
+1. **main()**
+
+   * Calls `passTwo()` → generates object code.
+   * Calls `display()` → prints contents of input/output/symtab files.
+
+---
+
+### 🔹 passTwo()
+
+* Implements **Pass 2** of the assembler.
+* Input files:
+
+  * `intermediate.txt` → Intermediate code after Pass 1.
+  * `optab.txt` → Operation code table (mnemonics & opcodes).
+  * `symtab.txt` → Symbol table with addresses.
+  * `length.txt` → Length of the program.
+* Output file:
+
+  * `output.txt` → Final object program.
+
+**Steps:**
+
+1. Reads the first line. If opcode is `START`, initializes program counter (`start`).
+2. Writes **Header Record (H)** into output file.
+3. Iterates through each instruction until `END`.
+4. Searches in **OPTAB** for opcode.
+5. If mnemonic is found, searches in **SYMTAB** for operand address.
+6. Generates **Object Code** (`objCode`).
+
+   * If `BYTE` with character constant → converts chars to ASCII hex.
+   * If `BYTE` with hex constant → directly stores hex.
+   * If `WORD` → stores 3-byte constant.
+   * Else → blank.
+7. Writes **Text Record (T)** for each instruction.
+8. At the end, writes **End Record (E)**.
+
+---
+
+### 🔹 display()
+
+* Prints the contents of:
+
+  * `input.txt`
+  * `output.txt`
+  * `symtab.txt`
+
+This is just for debugging/verification.
+
+---
+
+### 🔹 Output Format (Object Program)
+
+* **Header Record (H)**: program name, start address, program length.
+* **Text Records (T)**: object codes with addresses.
+* **End Record (E)**: starting execution address.
+
+---
+
+✅ In short: This program is a **Pass 2 assembler implementation in C** that generates the final object code from the intermediate representation using `optab` and `symtab`.
+
+---
+
+Do you want me to also give you a **sample input/output file set** (`input.txt`, `optab.txt`, `symtab.txt`, `intermediate.txt`, etc.) with expected `output.txt` so you can test this code directly?
